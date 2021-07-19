@@ -9,11 +9,12 @@ import Foundation
 import UIKit
 import WebKit
 
-class TableOfLaunchesVC: UINavigationController,UITableViewDelegate,UITableViewDataSource,TableOfLaunchesListener{
+class TableOfLaunchesVC: UINavigationController,UITableViewDelegate,UITableViewDataSource, TableOfLaunchesListener{
     private let cellID="TableOfLaunchesCell"
     private let tableView=UITableView()
     private let model = TableOfLaunchesModel()
-    
+    private let refreshControl = UIRefreshControl()
+
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return self.model.getCount()
     }
@@ -49,15 +50,26 @@ class TableOfLaunchesVC: UINavigationController,UITableViewDelegate,UITableViewD
         self.tableView.frame=self.view.frame
         self.tableView.register(TableOfLaunchesCell.self, forCellReuseIdentifier: self.cellID)
         self.tableView.rowHeight=80
+        
         self.model.listener=self
         
         self.view.addSubview(self.tableView)
         tableView.frame=self.view.bounds
         
+        self.refreshControl.attributedTitle = NSAttributedString(string: "Refresh")
+        self.refreshControl.addTarget(self, action: #selector(self.refresh(_:)), for: .valueChanged)
+        self.tableView.addSubview(refreshControl) // not required when using UITableViewController
     }
+    
+    @objc func refresh(_ sender: AnyObject) {
+        self.model.requestData()
+    }
+
+    
     func update() {
         DispatchQueue.main.async{
             self.tableView.reloadData()
+            self.refreshControl.endRefreshing()
         }
     }
 }

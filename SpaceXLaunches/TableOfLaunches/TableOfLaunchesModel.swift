@@ -24,6 +24,7 @@ class TableOfLaunchesModel{
     }
     
     func requestData(){
+        print("data request")
         guard let url = URL(string: "https://api.spacexdata.com/v3/launches")
         else{
             return
